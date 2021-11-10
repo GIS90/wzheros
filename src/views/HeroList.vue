@@ -1,11 +1,18 @@
 <template>
-  <van-sidebar v-model="active" class="sidebar">
-    <van-sidebar-item v-for="(item, index) in this.menuList"
-                      :key="item.id"
-                      :title="item.title"
-                      @click="toUrl(item.url, index)"/>
-  </van-sidebar>
-  <router-view />
+  <div class="van-side">
+    <div class="van-side-bar">
+      <van-sidebar v-model="this.isActive">
+        <van-sidebar-item v-for="(item, index) in this.menuList"
+                          :key="item.id"
+                          :title="item.title"
+                          :class="{active : this.isActive == index}"
+                          @click="toUrl(item.url, index)"/>
+      </van-sidebar>
+    </div>
+    <div class="van-side-content">
+      <router-view />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -23,20 +30,19 @@ export default {
     const route = useRoute()
     this.route = route
     let flag = false
-    console.log(route.params.heroType)
     for (const index in this.menuList) {
       if (route.params.heroType === this.menuList[index].name) {
-        this.active = this.menuList[index].id
+        this.isActive = this.menuList[index].id
         flag = true
       }
     }
     if (!flag) {
-      this.active = 0
+      this.isActive = 0
     }
   },
   data () {
     return {
-      active: 0,
+      isActive: 0,
       route: null,
       router: null,
       menuList: [
@@ -53,7 +59,7 @@ export default {
   methods: {
     toUrl (url, index) {
       console.log(url)
-      this.active = index
+      this.isActive = index
       this.router.push(url)
     }
   }
@@ -61,9 +67,31 @@ export default {
 </script>
 
 <style scoped>
-.sidebar {
-  float: left;
-  /*position:fixed;*/
-  /*z-index: 100;*/
+.active {
+  background-color: #42b983;
+  color: red;
+}
+
+.van-side {
+  display: -webkit-flex;
+  display: inline-flex;
+}
+
+.van-side-bar {
+  position: fixed;
+  width: 80px;
+  flex-shrink: 0;
+  left: 0;
+  z-index: 1;
+  overflow-y: scroll;
+  background-color: #555555;
+  box-shadow: 0 8px 12px #ebedf0;
+}
+
+.van-side-content {
+  margin-left: 80px;
+  width: 100%;
+  overflow-y: scroll;
+  display: flex;
 }
 </style>
