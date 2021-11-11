@@ -1,12 +1,12 @@
 <template>
   <div class="van-side">
     <div class="van-side-bar">
-      <van-sidebar v-model="this.isActive">
+      <van-sidebar v-model="this.isMenuActive">
         <van-sidebar-item v-for="(item, index) in this.menuList"
                           :key="item.id"
                           :title="item.title"
-                          :class="{active : this.isActive == index}"
-                          @click="toUrl(item.url, index)"/>
+                          :class="{active : this.isMenuActive == index}"
+                          @click="this.toUrl(item.url, index)"/>
       </van-sidebar>
     </div>
     <div class="van-side-content">
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+// import packages
 import { Sidebar, SidebarItem } from 'vant'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -26,26 +27,33 @@ export default {
     'van-sidebar-item': SidebarItem
   },
   created () {
+    this.initData()
     this.router = useRouter()
     const route = useRoute()
     this.route = route
     let flag = false
+    // initialize select menu by url heroType parameter
     for (const index in this.menuList) {
       if (route.params.heroType === this.menuList[index].name) {
-        this.isActive = this.menuList[index].id
+        this.isMenuActive = this.menuList[index].id
         flag = true
       }
     }
     if (!flag) {
-      this.isActive = 0
+      this.isMenuActive = 0
     }
   },
   data () {
     return {
-      isActive: 0,
+      isMenuActive: 0,
       route: null,
       router: null,
-      menuList: [
+      menuList: []
+    }
+  },
+  methods: {
+    initData () {
+      this.menuList = [
         { id: 0, name: 'all', title: '全部', url: '/hero/all' },
         { id: 1, name: 'tank', title: '坦克', url: '/hero/tank' },
         { id: 2, name: 'warrior', title: '战士', url: '/hero/warrior' },
@@ -54,12 +62,9 @@ export default {
         { id: 5, name: 'shooter', title: '射手', url: '/hero/shooter' },
         { id: 6, name: 'auxiliary', title: '辅助', url: '/hero/auxiliary' }
       ]
-    }
-  },
-  methods: {
+    },
     toUrl (url, index) {
-      console.log(url)
-      this.isActive = index
+      this.isMenuActive = index
       this.router.push(url)
     }
   }
@@ -92,7 +97,7 @@ export default {
   margin-left: 80px;
   width: 100%;
   /*overflow-x: auto;*/
-  overflow-y: auto;
+  /*overflow-y: auto;*/
   display: flex;
 }
 </style>

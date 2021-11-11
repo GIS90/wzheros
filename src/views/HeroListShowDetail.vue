@@ -1,9 +1,12 @@
 <template>
   <div class="dc-bar">
     <van-nav-bar
-      :title="this.navTitle"
-      :left-text="this.navLeftText"
-      left-arrow
+      :title="this.navBarParams.title"
+      :left-text="this.navBarParams.leftText"
+      :fixed="this.navBarParams.fixed"
+      :border="this.navBarParams.border"
+      left-arrow="true"
+      z-index="10"
       @click-left="retHeroList()"
       @click-right="retHeroHome()"
     >
@@ -12,31 +15,32 @@
       </template>
     </van-nav-bar>
   </div>
-  <div class="dc-notice" v-if="this.noticeShow">
+  <div class="dc-notice" v-if="this.noticeParams.show">
     <van-notice-bar
       left-icon="volume-o"
-      scrollable
-      mode="closeable"
-      :text="this.noticeContent"
+      :scrollable="this.noticeParams.scroll"
+      :mode="this.noticeParams.mode"
+      :deploy="this.noticeParams.delay"
+      :text="this.noticeParams.content"
      />
   </div>
   <div class="dc-preview">
     <img :class="{'image-rotate' : this.imageRotate}"
          @click="rotateImage()"
-         src="https://game.gtimg.cn/images/yxzj/img201606/heroimg/155/155.jpg">
+         :src="this.heroBase.image">
     <div class="dc-preview-content">
       <div class="dc-pc-title">
-        艾琳
+        {{ this.heroBase.name }}
       </div>
       <div class="dc-pc-type">
         <div>定位:
-          <van-tag v-for="item in this.tags" :key="item" :type="item.type" class="dc-preview-tag">{{ item.name}}</van-tag>
+          <van-tag v-for="item in this.heroBase.role" :key="item.id" :type="item.type" class="dc-preview-tag">{{ item.name}}</van-tag>
         </div>
       </div>
       <div class="dc-pc-resume">
-        艾琳是黄金森林的在逃精灵公主，日落圣殿的不速之客。
+        {{ this.heroBase.resume }}
       </div>
-      <div @click="showDetailStory()" :class='["dc-pc-store", this.storeActive == true ? "dc-pc-store-active" : ""]'>
+      <div @click="showDetailStory()" :class='["dc-pc-store", this.heroStoreParams.active == true ? "dc-pc-store-active" : ""]'>
         .....查看详情
       </div>
     </div>
@@ -45,8 +49,8 @@
     <div>技能说明</div>
   </div>
   <div class="dc-skill">
-    <van-tabs v-model:active="this.tabActive" swipeable animated>
-      <van-tab v-for="(item, index) in this.kills" :key="index">
+    <van-tabs v-model:active="this.heroSkillParams.active" swipeable animated>
+      <van-tab v-for="(item, index) in this.heroSkillParams.skillList" :key="index">
         <template #title> <van-icon :name="item.image" size="2.3rem"/></template>
         <div class="dc-skill-content">
           <div class="dc-skill-content-title">
@@ -61,21 +65,56 @@
       </van-tab>
     </van-tabs>
   </div>
-  <van-action-sheet v-model:show="this.storeShow"
-                    closeable
-                    duration="1"
-                    cancel-text="关闭"
+  <div class="dc-equip-title">
+    <van-divider content-position="left"><van-icon name="eye" color="#1989FA" />装备推荐</van-divider>
+  </div>
+  <div class="dc-equip">
+    <van-tabs v-model:active="this.heroEqipParams.active" swipeable animated>
+      <van-tab v-for="(item, index) in this.heroEqipParams.equipList" :key="index" :title="item.title">
+        <van-grid :column-num="this.heroEqipParams.columnNum"
+                  :iconSize="this.heroEqipParams.iconSize"
+                  :border="this.heroEqipParams.border"
+                  :center="this.heroEqipParams.columnNum"
+                  :square="this.heroEqipParams.square"
+                  :clickable="this.heroEqipParams.click">
+          <van-grid-item class="grid-item"
+                         v-for="value in item.data"
+                         :key="value.id"
+                         :icon="value.image"
+                         :text="value.name"
+          />
+        </van-grid>
+        <van-tag :show="this.heroEqipParams.tipShow"
+                 :type="this.heroEqipParams.tipType"
+                 mark
+                 :size="this.heroEqipParams.tipSize"
+                 :plain="this.heroEqipParams.tipPlain"
+                 :closeable="this.heroEqipParams.tipClose"
+                 @close="closeEquipTip()"
+                 class="dc-equip-tip">
+          {{ item.tip}}
+        </van-tag>
+      </van-tab>
+    </van-tabs>
+  </div>
+  <div class="dc-equip-title">
+    <van-divider content-position="left"><van-icon name="fire" color="#ee0a24" />符文推荐</van-divider>
+  </div>
+  <van-action-sheet v-model:show="this.heroStoreParams.show"
+                    :closeable="this.heroStoreParams.closeAble"
+                    :duration="this.heroStoreParams.duration"
+                    :cancel-text="this.heroStoreParams.cancelText"
                     close-on-click-action
-                    title="英雄故事"
-                    :description="this.storeDescription">
-    <div class="sheetContent" v-html="this.storeContent">
+                    :title="this.heroStoreParams.title"
+                    :description="this.heroStoreParams.resume">
+    <div class="sheetContent" v-html="this.heroStoreParams.content">
     </div>
   </van-action-sheet>
 </template>
 
 <script>
 import { useRoute } from 'vue-router'
-import { Icon, NoticeBar, ActionSheet, Tag, NavBar, Tab, Tabs } from 'vant'
+import { Icon, NoticeBar, ActionSheet, Tag, NavBar, Tab, Tabs, Grid, GridItem, Divider } from 'vant'
 import router from '../router/index.ts'
 
 export default {
@@ -97,34 +136,86 @@ export default {
     'van-tag': Tag,
     'van-nav-bar': NavBar,
     'van-tab': Tab,
-    'van-tabs': Tabs
+    'van-tabs': Tabs,
+    'van-grid': Grid,
+    'van-grid-item': GridItem,
+    'van-divider': Divider
   },
   data () {
     return {
       route: null,
-      imageRotate: false,
+      imageRotate: false, // 头像是否旋转
       heroType: 'all',
       heroId: 0,
-      noticeShow: true,
-      noticeContent: '欢迎访问本人博客：http://pygo2.top/',
-      navTitle: '',
-      navLeftText: '返回',
-      navRightText: '',
-      tags: [
-        { name: '法师', type: 'primary' },
-        { name: '射手', type: 'success' }
-      ],
-      storeShow: false,
-      storeActive: false,
-      storeDescription: '艾琳是黄金森林的在逃精灵公主，日落圣殿的不速之客',
-      storeContent: '<p>精灵族是优雅或是规矩的代名词。他们千百年封闭生活于黄金森林，他们以优雅舞蹈与信仰月桂圣树交流获得力量，阻挡一切外来者的入侵，同时也禁锢了本族的领域。</p><p>公主艾琳天性机灵活泼，对一切未知充满好奇心与探索欲。然而“继承人”的责任始终压在她的肩膀上，她被要求收起不稳重的一面，遵循精灵族舞蹈的优雅与绝对的秩序，做好一个“真正的公主”。</p><p>成年仪式前夕，艾琳决定打破族群禁令，逃去森林外的“危险古怪的人类世界”开启一场自由的冒险。旅程却并没有想象中那样顺遂，人类对精灵同样存在“不详邪恶”的重重误解。</p><p>越是未知，越是有趣，越是困难，越有斗志。她以舞蹈为表达自我的“语言”，与红头发的法师小女孩成为密友，给圣殿严肃守序的骑士团带来了诸多意外麻烦，甚至组成了圣殿小分队在西方大陆的各个地方冒险……</p>',
-      tabActive: 0,
-      kills: [
-        { id: 1, name: '精灵舞步', cd: '0', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15500.png', description: '艾琳普攻命中敌人后造成150(+20%法术攻击)法术伤害，并获得能量，能量满后艾琳消耗能量急速飞行。 能量满后艾琳获得一次强化普攻，对首个命中的目标造成180(+30%法术攻击)法术伤害。 艾琳每100点法术攻击可以转化为1%暴击率。' },
-        { id: 2, name: '叶舞·致意', cd: '7', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15510.png', description: '艾琳射出一束月桂叶，对命中的目标造成法术伤害，命中敌方英雄或飞行到最远处后展开成环，对触碰的敌人造成法术伤害和50%减速，持续1秒。' },
-        { id: 3, name: '旋舞·轻语', cd: '10/9.2/8.4/7.6/6.8/6', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15520.png', description: '艾琳受到黄金森林的祝福，立即回满能量，同时叠加两层月桂印记，获得免疫减速效果并增加攻速，持续3秒。' },
-        { id: 4, name: '月桂之舞·盛放', cd: '20/17.5/15', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15530.png', description: '艾琳能量满后会叠加一层月桂印记。当月桂印记达到6层时【月桂之舞·盛放】解锁，印记叠加上限为12/15/18层。 技能开启时，艾琳增加10%移速，不断消耗印记发出月桂飞叶，对范围内血量最少的目标造成80(+18%法术攻击)法术伤害。' }
-      ]
+      // notice component parameters
+      noticeParams: {
+        show: true,
+        scroll: true,
+        mode: 'closeable',
+        url: '',
+        delay: 1,
+        content: '欢迎访问本人博客：http://pygo2.top/'
+      },
+      // nav bar component parameters
+      navBarParams: {
+        title: '',
+        leftText: '返回',
+        rightText: '',
+        fixed: false,
+        border: true
+      },
+      // data list parameters
+      // hero base info
+      heroBase: {
+        name: '艾琳',
+        image: 'https://game.gtimg.cn/images/yxzj/img201606/heroimg/155/155.jpg',
+        role: [
+          { id: 1, name: '法师', type: 'primary' },
+          { id: 2, name: '射手', type: 'success' }
+        ],
+        resume: '黄金森林的在逃精灵公主，日落圣殿的不速之客。'
+      },
+      // hero store info
+      heroStoreParams: {
+        show: false,
+        active: false,
+        title: '英雄故事',
+        closeAble: true,
+        cancelText: '关闭',
+        duration: 0.8,
+        resume: '艾琳是黄金森林的在逃精灵公主，日落圣殿的不速之客。',
+        content: '<p>精灵族是优雅或是规矩的代名词。他们千百年封闭生活于黄金森林，他们以优雅舞蹈与信仰月桂圣树交流获得力量，阻挡一切外来者的入侵，同时也禁锢了本族的领域。</p><p>公主艾琳天性机灵活泼，对一切未知充满好奇心与探索欲。然而“继承人”的责任始终压在她的肩膀上，她被要求收起不稳重的一面，遵循精灵族舞蹈的优雅与绝对的秩序，做好一个“真正的公主”。</p><p>成年仪式前夕，艾琳决定打破族群禁令，逃去森林外的“危险古怪的人类世界”开启一场自由的冒险。旅程却并没有想象中那样顺遂，人类对精灵同样存在“不详邪恶”的重重误解。</p><p>越是未知，越是有趣，越是困难，越有斗志。她以舞蹈为表达自我的“语言”，与红头发的法师小女孩成为密友，给圣殿严肃守序的骑士团带来了诸多意外麻烦，甚至组成了圣殿小分队在西方大陆的各个地方冒险……</p>'
+      },
+      // hero skill info
+      heroSkillParams: {
+        active: 0,
+        skillList: [
+          { id: 1, name: '精灵舞步', cd: '0', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15500.png', description: '艾琳普攻命中敌人后造成150(+20%法术攻击)法术伤害，并获得能量，能量满后艾琳消耗能量急速飞行。 能量满后艾琳获得一次强化普攻，对首个命中的目标造成180(+30%法术攻击)法术伤害。 艾琳每100点法术攻击可以转化为1%暴击率。' },
+          { id: 2, name: '叶舞·致意', cd: '7', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15510.png', description: '艾琳射出一束月桂叶，对命中的目标造成法术伤害，命中敌方英雄或飞行到最远处后展开成环，对触碰的敌人造成法术伤害和50%减速，持续1秒。' },
+          { id: 3, name: '旋舞·轻语', cd: '10/9.2/8.4/7.6/6.8/6', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15520.png', description: '艾琳受到黄金森林的祝福，立即回满能量，同时叠加两层月桂印记，获得免疫减速效果并增加攻速，持续3秒。' },
+          { id: 4, name: '月桂之舞·盛放', cd: '20/17.5/15', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15530.png', description: '艾琳能量满后会叠加一层月桂印记。当月桂印记达到6层时【月桂之舞·盛放】解锁，印记叠加上限为12/15/18层。 技能开启时，艾琳增加10%移速，不断消耗印记发出月桂飞叶，对范围内血量最少的目标造成80(+18%法术攻击)法术伤害。' }
+        ]
+      },
+      // hero equip info
+      heroEqipParams: {
+        active: 0,
+        columnNum: 3,
+        iconSize: '2.8rem',
+        border: false,
+        center: true,
+        square: false,
+        click: false,
+        equipList: [
+          { id: 1, title: '方案一', tip: '利用金色圣剑和博学者之怒过渡，随后补充一件血族之书提高续航能力。中后期补充法强和穿透，最大化输出能力。', data: [{ id: 1, name: '急速战靴', sale: 426, sum: 710, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1425.jpg' }, { id: 2, name: '速击之枪', sale: 534, sum: 890, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1129.jpg' }, { id: 3, name: '金色圣剑', sale: 1241, sum: 2470, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1728.jpg' }, { id: 4, name: '博学者之怒', sale: 1380, sum: 2300, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1232.jpg' }, { id: 5, name: '血族之书', sale: 744, sum: 1742, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1222.jpg' }, { id: 6, name: '光辉之剑', sale: 426, sum: 730, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1223.jpg' }] },
+          { id: 2, title: '方案二', tip: '利用巫术法杖提高普攻伤害。', data: [{ id: 1, name: '名刀司命', sale: 1960, sum: 2090, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1127.jpg' }, { id: 2, name: '抵抗之靴', sale: 526, sum: 710, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1422.jpg' }, { id: 3, name: '暗影战斧', sale: 1426, sum: 2050, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1137.jpg' }, { id: 4, name: '冰痕之握', sale: 1212, sum: 2070, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/13310.jpg' }, { id: 5, name: '破军', sale: 1770, sum: 2950, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1138.jpg' }, { id: 6, name: '魔女斗篷', sale: 1272, sum: 2800, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1335.jpg' }] }
+        ],
+        tipShow: true,
+        tipType: 'primary',
+        tipSize: 'medium',
+        tipPlain: false,
+        tipClose: true
+
+      }
     }
   },
   methods: {
@@ -141,8 +232,11 @@ export default {
       router.push('/')
     },
     showDetailStory () {
-      this.storeShow = true
-      this.storeActive = true
+      this.heroStoreParams.show = true
+      this.heroStoreParams.active = true
+    },
+    closeEquipTip () {
+      this.heroEqipParams.tipShow = false
     }
   }
 }
@@ -191,7 +285,7 @@ export default {
   line-height: 1.5rem;
 }
 .sheetContent {
-  padding: 0.5rem 1.5rem 0 1.5rem;
+  padding: 0.3rem 1.5rem 0.3rem 1.5rem;
 }
 .image-rotate {
   transform: rotate(-360deg) scale(1.2, 1.2);
@@ -231,5 +325,15 @@ export default {
 .dc-skill-content .dc-skill-content-content {
   margin-top: 0.6rem;
   line-height: 1.6rem;
+}
+.dc-equip-title {
+  color: #fff;
+  font-size: 1rem !important;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+.dc-equip-tip {
+  margin: 0.5rem 0.5rem 0 0.5rem;
+  font-size: 0.8rem;
 }
 </style>
