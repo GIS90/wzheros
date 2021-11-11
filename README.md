@@ -19,7 +19,7 @@
 
 #### 其他
 
-- github主分支：master
+- github主分支：main
 
 ## 常用命令
 
