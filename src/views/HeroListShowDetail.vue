@@ -63,7 +63,7 @@
   </div>
   <van-action-sheet v-model:show="this.storeShow"
                     closeable
-                    duration="1.2"
+                    duration="1"
                     cancel-text="关闭"
                     close-on-click-action
                     title="英雄故事"
@@ -191,7 +191,7 @@ export default {
   line-height: 1.5rem;
 }
 .sheetContent {
-  padding: 16px 16px 100%;
+  padding: 0.5rem 1.5rem 0 1.5rem;
 }
 .image-rotate {
   transform: rotate(-360deg) scale(1.2, 1.2);

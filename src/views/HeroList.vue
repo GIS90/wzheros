@@ -83,7 +83,7 @@ export default {
   flex-shrink: 0;
   left: 0;
   z-index: 1;
-  overflow-y: scroll;
+  /*overflow-y: scroll;*/
   background-color: #555555;
   box-shadow: 0 8px 12px #ebedf0;
 }
@@ -91,7 +91,8 @@ export default {
 .van-side-content {
   margin-left: 80px;
   width: 100%;
-  overflow-y: scroll;
+  /*overflow-x: auto;*/
+  overflow-y: auto;
   display: flex;
 }
 </style>
