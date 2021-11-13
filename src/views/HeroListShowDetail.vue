@@ -144,7 +144,6 @@
       </van-tag>
     </div>
   </div>
-
   <!-- store action sheet -->
   <van-action-sheet v-model:show="this.heroStoreParams.show"
                     :closeable="this.heroStoreParams.closeAble"
@@ -160,7 +159,7 @@
 
 <script>
 import { useRoute } from 'vue-router'
-import { Icon, NoticeBar, ActionSheet, Tag, NavBar, Tab, Tabs, Grid, GridItem, Divider, Col, Row } from 'vant'
+import { Icon, NoticeBar, ActionSheet, Tag, NavBar, Tab, Tabs, Grid, GridItem, Divider, Col, Row, PullRefresh } from 'vant'
 import router from '../router/index.ts'
 
 export default {
@@ -188,6 +187,7 @@ export default {
     'van-divider': Divider,
     'van-col': Col,
     'van-row': Row
+    // 'van-pull-refresh': PullRefresh
   },
   data () {
     return {
@@ -427,4 +427,10 @@ export default {
   text-align: center;
   font-size: 0.8rem;
 }
+.doge {
+    width: 140px;
+    height: 72px;
+    margin-top: 8px;
+    border-radius: 4px;
+  }
 </style>
