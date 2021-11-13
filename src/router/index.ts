@@ -2,6 +2,9 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HeroList from '../views/HeroList.vue'
 import HeroListShow from '../views/HeroListShow.vue'
 import HeroListShowDetail from '../views/HeroListShowDetail.vue'
+import EquipList from '../views/EquipList.vue'
+import DFList from '../views/DFList.vue'
+import SetList from '../views/SetList.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -21,6 +24,21 @@ const routes: Array<RouteRecordRaw> = [
     path: '/hero/:heroType/:heroId',
     name: 'HeroListShowDetail',
     component: HeroListShowDetail
+  },
+  {
+    path: '/equip',
+    name: 'EquipList',
+    component: EquipList
+  },
+  {
+    path: '/df',
+    name: 'DFList',
+    component: DFList
+  },
+  {
+    path: '/set',
+    name: 'SetList',
+    component: SetList
   }
 ]
 

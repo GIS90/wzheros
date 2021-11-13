@@ -96,8 +96,8 @@ export default {
 .van-side-content {
   margin-left: 80px;
   width: 100%;
-  /*overflow-x: auto;*/
-  /*overflow-y: auto;*/
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
 }
 </style>
