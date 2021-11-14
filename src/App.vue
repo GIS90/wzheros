@@ -18,6 +18,7 @@
 </template>
 
 <script>
+// import { useRoute } from 'vue-router'
 import { Tabbar, TabbarItem } from 'vant'
 
 export default {

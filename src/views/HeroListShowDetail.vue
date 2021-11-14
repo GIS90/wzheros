@@ -4,9 +4,9 @@
     <van-nav-bar
       :title="this.navBarParams.title"
       :left-text="this.navBarParams.leftText"
+      left-arrow
       :fixed="this.navBarParams.fixed"
       :border="this.navBarParams.border"
-      left-arrow="true"
       z-index="10"
       @click-left="retHeroList()"
       @click-right="retHeroHome()"
@@ -118,6 +118,7 @@
       </van-divider>
     </div>
     <div class="dc-module">
+      <!-- 符文图文 -->
       <van-row :align="this.heroRuneParams.cellAlign" :justify="this.heroRuneParams.cellJustify" wrap>
         <van-col span="8" v-for="item in this.heroRuneParams.defaultList.data" :key="item.id">
           <div>
@@ -133,6 +134,7 @@
           </div>
         </van-col>
       </van-row>
+      <!-- 符文tip -->
       <van-tag :show="this.heroRuneParams.tipShow"
          :type="this.heroRuneParams.tipType"
          :mark="this.heroRuneParams.tipMark"
@@ -142,9 +144,27 @@
          class="dc-module-tip">
         {{ this.heroRuneParams.defaultList.tip }}
       </van-tag>
+      <!-- 大神推荐符文 -->
+      <div class="dc-module-extra" v-if="this.heroRuneParams.extraShow">
+        <van-cell-group :inset="this.heroRuneParams.extraInset" :border="this.heroRuneParams.extraBorder">
+          <van-cell v-for="(item, index) in this.heroRuneParams.extraList"
+                    :key="item.id"
+                    :icon="item.icon"
+                    :title="item.text"
+                    :label="item.label"
+                    :value="item.value"
+                    :size="this.heroRuneParams.extraSize"
+                    :center="this.heroRuneParams.extraCenter"
+                    :clickable="true"
+                    :is-link="this.heroRuneParams.extraIsLink"
+                    :arrow-direction="this.heroRuneParams.extraIsLinkDir"
+                    @click="showRuneDetail(index)"
+                    />
+        </van-cell-group>
+      </div>
     </div>
   </div>
-  <!-- store action sheet -->
+  <!-- 英雄故事actionSheet -->
   <van-action-sheet v-model:show="this.heroStoreParams.show"
                     :closeable="this.heroStoreParams.closeAble"
                     :duration="this.heroStoreParams.duration"
@@ -159,7 +179,7 @@
 
 <script>
 import { useRoute } from 'vue-router'
-import { Icon, NoticeBar, ActionSheet, Tag, NavBar, Tab, Tabs, Grid, GridItem, Divider, Col, Row, PullRefresh } from 'vant'
+import { Icon, NoticeBar, ActionSheet, Tag, NavBar, Tab, Tabs, Grid, GridItem, Divider, Col, Row, Cell, CellGroup } from 'vant'
 import router from '../router/index.ts'
 
 export default {
@@ -172,7 +192,9 @@ export default {
     } else {
       this.heroId = 0
     }
-    console.log('created' + this.heroId)
+  },
+  mounted () {
+    //
   },
   components: {
     'van-icon': Icon,
@@ -186,12 +208,16 @@ export default {
     'van-grid-item': GridItem,
     'van-divider': Divider,
     'van-col': Col,
-    'van-row': Row
-    // 'van-pull-refresh': PullRefresh
+    'van-row': Row,
+    'van-cell': Cell,
+    'van-cell-group': CellGroup
   },
   data () {
     return {
+      // use instance parameter
       route: null,
+      dialog: null,
+      // other
       imageRotate: false, // 头像是否旋转
       heroType: 'all',
       heroId: 0,
@@ -199,7 +225,7 @@ export default {
       noticeParams: {
         show: true,
         scroll: true,
-        mode: 'closeable',
+        mode: 'closeable', // 是否可关闭
         url: '',
         delay: 1,
         content: '欢迎访问本人博客：http://pygo2.top/'
@@ -293,7 +319,21 @@ export default {
         tipSize: 'medium',
         tipPlain: false,
         tipClose: false,
-        tipMark: false
+        tipMark: false,
+        extraShow: true,
+        extraInset: false, // 是否展示为圆角卡片风格
+        extraBorder: true,
+        extraSize: 'normal', // large
+        extraCenter: true,
+        extraIsLink: true,
+        extraIsLinkDir: '', // top left down right(default, value is null)
+        extraList: [
+          { id: 1, text: '大神推荐1', icon: 'location-o', label: '高爆发、高吸血', value: '', data: [{ id: 1, name: '无双', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/1510.png', content: '暴击率+0.7%\n暴击效果+3.6%', url: '/' }, { id: 2, name: '贪婪', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/2503.png', content: '法术吸血+1.6%', url: '' }, { id: 3, name: '心眼', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/3515.png', content: '暴攻速加成+0.6%\n法术穿透+6.4', url: '' }] },
+          { id: 2, text: '大神推荐2', icon: 'shop-o', label: '前期够坦度，抗压推荐', value: '', data: [{ id: 1, name: '无双', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/1510.png', content: '暴击率+0.7%\n暴击效果+3.6%', url: '/' }, { id: 2, name: '贪婪', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/2503.png', content: '法术吸血+1.6%', url: '' }, { id: 3, name: '心眼', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/3515.png', content: '暴攻速加成+0.6%\n法术穿透+6.4', url: '' }] },
+          { id: 3, text: '大神推荐3', icon: 'location-o', label: '百穿符文，帮助前期打出伤害，顺利过渡到中后期', value: '', data: [{ id: 1, name: '无双', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/1510.png', content: '暴击率+0.7%\n暴击效果+3.6%', url: '/' }, { id: 2, name: '贪婪', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/2503.png', content: '法术吸血+1.6%', url: '' }, { id: 3, name: '心眼', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/3515.png', content: '暴攻速加成+0.6%\n法术穿透+6.4', url: '' }] }
+        ],
+        extraSelectIndex: 0,
+        extraSelectShow: false
       }
     }
   },
@@ -316,6 +356,10 @@ export default {
     },
     closeEquipTip () {
       this.heroEqipParams.tipShow = false
+    },
+    showRuneDetail (index) {
+      this.heroRuneParams.extraSelectShow = true
+      this.heroRuneParams.extraSelectIndex = index
     }
   }
 }
@@ -427,10 +471,7 @@ export default {
   text-align: center;
   font-size: 0.8rem;
 }
-.doge {
-    width: 140px;
-    height: 72px;
-    margin-top: 8px;
-    border-radius: 4px;
-  }
+.dc-module-extra {
+  margin-top: 0.5rem;
+}
 </style>

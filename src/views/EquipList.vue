@@ -10,7 +10,7 @@
                     :head-height='this.globalPullRefParams.headHeight'
                     @refresh='onRefresh'
   >
-    <p>下拉刷新次数: {{ this.globalPullRefParams.refCount }}</p>
+    <p>下拉刷新次数: {{ this.globalPullRefParams.count }}</p>
   </van-pull-refresh>
 </template>
 

@@ -12,13 +12,17 @@ const routes: Array<RouteRecordRaw> = [
     name: 'HeroList',
     component: HeroList,
     redirect: '/hero/all',
+    meta: { title: '首页', icon: 'documentation' },
     children: [
       {
         path: 'hero/:heroType',
         name: 'HeroListShow',
         component: HeroListShow
       }
-    ]
+    ],
+    beforeEnter: (to, from) => {
+      //
+    }
   },
   {
     path: '/hero/:heroType/:heroId',
