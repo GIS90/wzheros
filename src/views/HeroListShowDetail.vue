@@ -175,11 +175,42 @@
     <div class="sheetContent" v-html="this.heroStoreParams.content">
     </div>
   </van-action-sheet>
+  <!-- 大神推荐符文显示 -->
+  <van-dialog v-model:show="this.heroRuneParams.extraSelectShow"
+              :title="this.heroRuneParams.extraList[this.heroRuneParams.extraSelectIndex].text"
+              >
+    <!-- 符文图文 -->
+      <van-row :align="this.heroRuneParams.cellAlign" :justify="this.heroRuneParams.cellJustify" wrap>
+        <van-col span="8" v-for="item in this.heroRuneParams.extraList[this.heroRuneParams.extraSelectIndex].data" :key="item.id">
+          <div>
+            <div class="dc-module-cell-icon">
+              <van-icon :name="item.image" :size="this.heroRuneParams.cellIconSize"/>
+            </div>
+            <div class="dc-module-cell-title">
+              {{ item.name }}
+            </div>
+            <div class="dc-module-cell-content">
+              {{ item.content }}
+            </div>
+          </div>
+        </van-col>
+      </van-row>
+      <!-- 符文tip -->
+      <van-tag :show="this.heroRuneParams.tipShow"
+         :type="this.heroRuneParams.tipType"
+         :mark="this.heroRuneParams.tipMark"
+         :size="this.heroRuneParams.tipSize"
+         :plain="this.heroRuneParams.tipPlain"
+         :closeable="this.heroRuneParams.tipClose"
+         class="dc-module-tip">
+        {{ this.heroRuneParams.extraList[this.heroRuneParams.extraSelectIndex].label }}
+      </van-tag>
+  </van-dialog>
 </template>
 
 <script>
 import { useRoute } from 'vue-router'
-import { Icon, NoticeBar, ActionSheet, Tag, NavBar, Tab, Tabs, Grid, GridItem, Divider, Col, Row, Cell, CellGroup } from 'vant'
+import { Icon, NoticeBar, ActionSheet, Tag, NavBar, Tab, Tabs, Grid, GridItem, Divider, Col, Row, Cell, CellGroup, Dialog } from 'vant'
 import router from '../router/index.ts'
 
 export default {
@@ -210,7 +241,8 @@ export default {
     'van-col': Col,
     'van-row': Row,
     'van-cell': Cell,
-    'van-cell-group': CellGroup
+    'van-cell-group': CellGroup,
+    'van-dialog': Dialog.Component
   },
   data () {
     return {
@@ -314,13 +346,13 @@ export default {
             { id: 3, name: '心眼', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/3515.png', content: '暴攻速加成+0.6%\n法术穿透+6.4', url: '' }
           ]
         },
-        tipShow: true,
+        tipShow: true, // 是否显示附文tip
         tipType: 'success',
         tipSize: 'medium',
         tipPlain: false,
         tipClose: false,
         tipMark: false,
-        extraShow: true,
+        extraShow: true, // 大神推荐附文
         extraInset: false, // 是否展示为圆角卡片风格
         extraBorder: true,
         extraSize: 'normal', // large
