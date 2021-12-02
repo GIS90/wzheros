@@ -56,30 +56,7 @@
     <div class="dc-module">
       <van-tabs v-model:active="this.heroEqipParams.active" swipeable animated>
         <van-tab v-for="(item, index) in this.heroEqipParams.list" :key="index" :title="item.title">
-          <van-grid :column-num="this.heroEqipParams.columnNum"
-                    :iconSize="this.heroEqipParams.iconSize"
-                    :border="this.heroEqipParams.border"
-                    :center="this.heroEqipParams.center"
-                    :square="this.heroEqipParams.square"
-                    :clickable="this.heroEqipParams.click">
-            <van-grid-item class="grid-item"
-                           v-for="value in item.data"
-                           :key="value.id"
-                           :icon="value.image"
-                           :text="value.name"
-                           :to="value.url"
-            />
-          </van-grid>
-          <van-tag :show="this.heroEqipParams.tipShow"
-                   :type="this.heroEqipParams.tipType"
-                   :mark="this.heroEqipParams.tipMark"
-                   :size="this.heroEqipParams.tipSize"
-                   :plain="this.heroEqipParams.tipPlain"
-                   :closeable="this.heroEqipParams.tipClose"
-                   @close="closeEquipTip()"
-                   class="dc-module-tip">
-            {{ item.tip }}
-          </van-tag>
+          <hero-detail-equip :item="item"></hero-detail-equip>
         </van-tab>
       </van-tabs>
     </div>
@@ -94,32 +71,10 @@
       ></hero-detail-module-title>
     </div>
     <div class="dc-module">
-      <!-- 符文图文 -->
-      <van-row :align="this.heroRuneParams.cellAlign" :justify="this.heroRuneParams.cellJustify" wrap>
-        <van-col span="8" v-for="item in this.heroRuneParams.defaultList.data" :key="item.id">
-          <div>
-            <div class="dc-module-cell-icon">
-              <van-icon :name="item.image" :size="this.heroRuneParams.cellIconSize"/>
-            </div>
-            <div class="dc-module-cell-title">
-              {{ item.name }}
-            </div>
-            <div class="dc-module-cell-content">
-              {{ item.content }}
-            </div>
-          </div>
-        </van-col>
-      </van-row>
-      <!-- 符文tip -->
-      <van-tag :show="this.heroRuneParams.tipShow"
-         :type="this.heroRuneParams.tipType"
-         :mark="this.heroRuneParams.tipMark"
-         :size="this.heroRuneParams.tipSize"
-         :plain="this.heroRuneParams.tipPlain"
-         :closeable="this.heroRuneParams.tipClose"
-         class="dc-module-tip">
-        {{ this.heroRuneParams.defaultList.tip }}
-      </van-tag>
+      <!-- 默认符文图文 -->
+      <hero-detail-rune-item :list="this.heroRuneParams.defaultList.data"
+                             :tip="this.heroRuneParams.defaultList.tip">
+      </hero-detail-rune-item>
       <!-- 大神推荐符文 -->
       <div class="dc-module-extra" v-if="this.heroRuneParams.extraShow">
         <van-cell-group :inset="this.heroRuneParams.extraInset" :border="this.heroRuneParams.extraBorder">
@@ -184,13 +139,15 @@
 
 <script>
 import { useRoute } from 'vue-router'
-import { Icon, Tag, Tab, Tabs, Grid, GridItem, Col, Row, Cell, CellGroup, Dialog } from 'vant'
+import { Icon, Tag, Tab, Tabs, Col, Row, Cell, CellGroup, Dialog } from 'vant'
 import router from '../router/index.ts'
 import HeroListShowDetailNav from '../components/HeroListShowDetailNav.vue'
 import HeroListShowDetailNotice from '../components/HeroListShowDetailNotice'
 import HeroListShowDetailInfoStore from '../components/HeroListShowDetailInfoStore'
 import HeroListShowDetailSkill from '../components/HeroListShowDetailSkill'
 import HeroListShowDetailModuleTitle from '../components/HeroListShowDetailModuleTitle'
+import HeroListShowDetailEquip from '../components/HeroListShowDetailEquip'
+import HeroListShowDetailRuneItem from '../components/HeroListShowDetailRuneItem'
 
 export default {
   name: 'HeroListShowDetail',
@@ -211,8 +168,6 @@ export default {
     'van-tag': Tag,
     'van-tab': Tab,
     'van-tabs': Tabs,
-    'van-grid': Grid,
-    'van-grid-item': GridItem,
     'van-col': Col,
     'van-row': Row,
     'van-cell': Cell,
@@ -222,7 +177,9 @@ export default {
     'hero-detail-notice': HeroListShowDetailNotice,
     'hero-detail-info-store': HeroListShowDetailInfoStore,
     'hero-detail-skill': HeroListShowDetailSkill,
-    'hero-detail-module-title': HeroListShowDetailModuleTitle
+    'hero-detail-module-title': HeroListShowDetailModuleTitle,
+    'hero-detail-equip': HeroListShowDetailEquip,
+    'hero-detail-rune-item': HeroListShowDetailRuneItem
   },
   data () {
     return {
@@ -275,33 +232,18 @@ export default {
         titleText: '装备推荐',
         titleLoc: 'left',
         active: 0,
-        columnNum: 3,
-        iconSize: '2.8rem',
-        border: false,
-        center: true,
-        square: false,
-        click: false,
         list: [
-          { id: 1, title: '方案一', tip: '利用金色圣剑和博学者之怒过渡，随后补充一件血族之书提高续航能力。中后期补充法强和穿透，最大化输出能力。', data: [{ id: 1, name: '急速战靴', sale: 426, sum: 710, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1425.jpg', url: '' }, { id: 2, name: '速击之枪', sale: 534, sum: 890, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1129.jpg', url: '' }, { id: 3, name: '金色圣剑', sale: 1241, sum: 2470, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1728.jpg', url: '' }, { id: 4, name: '博学者之怒', sale: 1380, sum: 2300, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1232.jpg', url: '' }, { id: 5, name: '血族之书', sale: 744, sum: 1742, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1222.jpg', url: '' }, { id: 6, name: '光辉之剑', sale: 426, sum: 730, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1223.jpg', url: '' }] },
-          { id: 2, title: '方案二', tip: '利用巫术法杖提高普攻伤害。', data: [{ id: 1, name: '名刀司命', sale: 1960, sum: 2090, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1127.jpg', url: '' }, { id: 2, name: '抵抗之靴', sale: 526, sum: 710, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1422.jpg', url: '' }, { id: 3, name: '暗影战斧', sale: 1426, sum: 2050, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1137.jpg', url: '' }, { id: 4, name: '冰痕之握', sale: 1212, sum: 2070, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/13310.jpg', url: '' }, { id: 5, name: '破军', sale: 1770, sum: 2950, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1138.jpg', url: '' }, { id: 6, name: '魔女斗篷', sale: 1272, sum: 2800, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1335.jpg', url: '' }] }
-        ],
-        tipShow: true,
-        tipType: 'primary',
-        tipSize: 'medium',
-        tipPlain: false,
-        tipClose: true,
-        tipMark: true
+          { id: 1, title: '方案一', tip: '利用金色圣剑和博学者之怒过渡，随后补充一件血族之书提高续航能力。中后期补充法强和穿透，最大化输出能力。', data: [{ id: 1, name: '急速战靴', sale: 426, sum: 710, badge: '新', image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1425.jpg', url: '' }, { id: 2, name: '速击之枪', sale: 534, sum: 890, badge: '热', image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1129.jpg', url: '' }, { id: 3, name: '金色圣剑', sale: 1241, sum: 2470, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1728.jpg', url: '' }, { id: 4, name: '博学者之怒', sale: 1380, sum: 2300, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1232.jpg', url: '' }, { id: 5, name: '血族之书', sale: 744, sum: 1742, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1222.jpg', url: '' }, { id: 6, name: '光辉之剑', sale: 426, sum: 730, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1223.jpg', url: '' }] },
+          { id: 2, title: '方案二', tip: '利用巫术法杖提高普攻伤害。', data: [{ id: 1, name: '名刀司命', sale: 1960, sum: 2090, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1127.jpg', url: '' }, { id: 2, name: '抵抗之靴', sale: 526, sum: 710, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1422.jpg', url: '' }, { id: 3, name: '暗影战斧', sale: 1426, sum: 2050, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1137.jpg', url: '' }, { id: 4, badge: '改', name: '冰痕之握', sale: 1212, sum: 2070, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/13310.jpg', url: '' }, { id: 5, name: '破军', sale: 1770, sum: 2950, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1138.jpg', url: '' }, { id: 6, name: '魔女斗篷', sale: 1272, sum: 2800, image: 'https://game.gtimg.cn/images/yxzj/img201606/itemimg/1335.jpg', url: '' }] }
+        ]
       },
-      // hero recommend runes scheme
+      // hero default runes scheme
       heroRuneParams: {
         show: true,
         titleIcon: 'fire',
         titleColor: '#ee0a24',
         titleText: '附文推荐',
         titleLoc: 'left',
-        cellIconSize: '2.8rem',
-        cellJustify: 'center',
-        cellAlign: 'top',
         defaultList: {
           tip: '提高吸血和暴击能力，提高续航和输出能力。',
           data: [
@@ -310,12 +252,6 @@ export default {
             { id: 3, name: '心眼', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/3515.png', content: '暴攻速加成+0.6%\n法术穿透+6.4', url: '' }
           ]
         },
-        tipShow: true, // 是否显示附文tip
-        tipType: 'success',
-        tipSize: 'medium',
-        tipPlain: false,
-        tipClose: false,
-        tipMark: false,
         extraShow: true, // 大神推荐附文
         extraInset: false, // 是否展示为圆角卡片风格
         extraBorder: true,
@@ -352,9 +288,6 @@ export default {
     },
     closeDetailStory () {
       this.heroStoreParams.show = false
-    },
-    closeEquipTip () {
-      this.heroEqipParams.tipShow = false
     },
     showRuneDetail (index) {
       this.heroRuneParams.extraSelectShow = true
@@ -438,10 +371,6 @@ export default {
   font-size: 1rem !important;
   font-weight: 800;
   letter-spacing: 2px;
-}
-.dc-module-tip {
-  margin: 0.5rem 0.5rem 0 0.5rem;
-  font-size: 0.9rem;
 }
 .dc-module-cell-icon {
   text-align: center;
