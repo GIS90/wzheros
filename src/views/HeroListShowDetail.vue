@@ -39,16 +39,7 @@
       <van-tabs v-model:active="this.heroSkillParams.active" swipeable animated>
         <van-tab v-for="(item, index) in this.heroSkillParams.list" :key="index">
           <template #title> <van-icon :name="item.image" size="2.3rem"/></template>
-          <div class="dc-skill-content">
-            <div class="dc-skill-content-title">
-              <div>{{ item.name }}</div>
-              <div><van-icon name="fire-o" color="#ee0a24" /> 冷却值: {{ item.cd }}</div>
-              <div><van-icon name="cart-o" color="#1989fa" /> 蓝消耗: {{ item.blue }}</div>
-            </div>
-            <div class="dc-skill-content-content">
-              {{ item.description }}
-            </div>
-          </div>
+          <hero-detail-skill :item="item"></hero-detail-skill>
         </van-tab>
       </van-tabs>
     </div>
@@ -56,9 +47,11 @@
   <!-- 装备推荐 -->
   <div v-if="this.heroEqipParams.show">
     <div class="dc-module-title">
-      <van-divider :content-position="this.heroEqipParams.titleLoc">
-        <van-icon :name="this.heroEqipParams.titleIcon" :color="this.heroEqipParams.titleColor" /> {{ this.heroEqipParams.titleText }}
-      </van-divider>
+      <hero-detail-module-title :location="this.heroEqipParams.titleLoc"
+                                :icon="this.heroEqipParams.titleIcon"
+                                :color="this.heroEqipParams.titleColor"
+                                :text="this.heroEqipParams.titleText"
+      ></hero-detail-module-title>
     </div>
     <div class="dc-module">
       <van-tabs v-model:active="this.heroEqipParams.active" swipeable animated>
@@ -94,9 +87,11 @@
   <!-- 附文推荐 -->
   <div v-if="this.heroRuneParams.show">
     <div class="dc-module-title">
-      <van-divider :content-position="this.heroRuneParams.titleLoc">
-        <van-icon :name="this.heroRuneParams.titleIcon" :color="this.heroRuneParams.titleColor" /> {{ this.heroRuneParams.titleText }}
-      </van-divider>
+      <hero-detail-module-title :location="this.heroRuneParams.titleLoc"
+                                :icon="this.heroRuneParams.titleIcon"
+                                :color="this.heroRuneParams.titleColor"
+                                :text="this.heroRuneParams.titleText"
+      ></hero-detail-module-title>
     </div>
     <div class="dc-module">
       <!-- 符文图文 -->
@@ -189,11 +184,13 @@
 
 <script>
 import { useRoute } from 'vue-router'
-import { Icon, Tag, Tab, Tabs, Grid, GridItem, Divider, Col, Row, Cell, CellGroup, Dialog } from 'vant'
+import { Icon, Tag, Tab, Tabs, Grid, GridItem, Col, Row, Cell, CellGroup, Dialog } from 'vant'
 import router from '../router/index.ts'
 import HeroListShowDetailNav from '../components/HeroListShowDetailNav.vue'
 import HeroListShowDetailNotice from '../components/HeroListShowDetailNotice'
 import HeroListShowDetailInfoStore from '../components/HeroListShowDetailInfoStore'
+import HeroListShowDetailSkill from '../components/HeroListShowDetailSkill'
+import HeroListShowDetailModuleTitle from '../components/HeroListShowDetailModuleTitle'
 
 export default {
   name: 'HeroListShowDetail',
@@ -216,7 +213,6 @@ export default {
     'van-tabs': Tabs,
     'van-grid': Grid,
     'van-grid-item': GridItem,
-    'van-divider': Divider,
     'van-col': Col,
     'van-row': Row,
     'van-cell': Cell,
@@ -224,7 +220,9 @@ export default {
     'van-dialog': Dialog.Component,
     'hero-detail-nav': HeroListShowDetailNav,
     'hero-detail-notice': HeroListShowDetailNotice,
-    'hero-detail-info-store': HeroListShowDetailInfoStore
+    'hero-detail-info-store': HeroListShowDetailInfoStore,
+    'hero-detail-skill': HeroListShowDetailSkill,
+    'hero-detail-module-title': HeroListShowDetailModuleTitle
   },
   data () {
     return {
@@ -434,21 +432,6 @@ export default {
   color: white;
   letter-spacing: 2px;
   text-shadow: 1px 1px 2px white;
-}
-.dc-skill-content {
-  display: block;
-  margin: 0 0.8rem 0 0.8rem;
-}
-.dc-skill-content .dc-skill-content-title {
-  font-size: 1rem;
-  font-weight: 800;
-}
-.dc-skill-content .dc-skill-content-title div {
-  margin-top: 0.4rem;
-}
-.dc-skill-content .dc-skill-content-content {
-  margin-top: 0.6rem;
-  line-height: 1.6rem;
 }
 .dc-module-title {
   color: #fff;
