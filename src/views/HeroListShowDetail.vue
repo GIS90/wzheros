@@ -1,30 +1,11 @@
 <template>
   <!-- 导航栏 -->
-  <div class="dc-bar">
-    <van-nav-bar
-      :title="this.navBarParams.title"
-      :left-text="this.navBarParams.leftText"
-      left-arrow
-      :fixed="this.navBarParams.fixed"
-      :border="this.navBarParams.border"
-      z-index="10"
-      @click-left="retHeroList()"
-      @click-right="retHeroHome()"
-    >
-      <template #right>
-        <van-icon name="wap-home-o" size="18" />
-      </template>
-    </van-nav-bar>
+  <div class="dc-bar" v-if="this.navBarShow">
+    <hero-detail-nav></hero-detail-nav>
   </div>
   <!-- notice通知 -->
-  <div class="dc-notice" v-if="this.noticeParams.show">
-    <van-notice-bar
-      left-icon="volume-o"
-      :scrollable="this.noticeParams.scroll"
-      :mode="this.noticeParams.mode"
-      :deploy="this.noticeParams.delay"
-      :text="this.noticeParams.content"
-     />
+  <div class="dc-notice" v-if="this.noticeBarShow">
+    <hero-detail-notice></hero-detail-notice>
   </div>
   <!-- 基本信息 -->
   <div class="dc-preview">
@@ -165,16 +146,14 @@
     </div>
   </div>
   <!-- 英雄故事actionSheet -->
-  <van-action-sheet v-model:show="this.heroStoreParams.show"
-                    :closeable="this.heroStoreParams.closeAble"
-                    :duration="this.heroStoreParams.duration"
-                    :cancel-text="this.heroStoreParams.cancelText"
-                    close-on-click-action
-                    :title="this.heroStoreParams.title"
-                    :description="this.heroStoreParams.resume">
-    <div class="sheetContent" v-html="this.heroStoreParams.content">
-    </div>
-  </van-action-sheet>
+  <div v-show="this.heroStoreParams.show">
+    <hero-detail-info-store :show="this.heroStoreParams.show"
+                            :title="this.heroStoreParams.title"
+                            :resume="this.heroStoreParams.resume"
+                            :content="this.heroStoreParams.content"
+                            @close-store="closeDetailStory()">
+    </hero-detail-info-store>
+  </div>
   <!-- 大神推荐符文显示 -->
   <van-dialog v-model:show="this.heroRuneParams.extraSelectShow"
               :title="this.heroRuneParams.extraList[this.heroRuneParams.extraSelectIndex].text"
@@ -210,8 +189,11 @@
 
 <script>
 import { useRoute } from 'vue-router'
-import { Icon, NoticeBar, ActionSheet, Tag, NavBar, Tab, Tabs, Grid, GridItem, Divider, Col, Row, Cell, CellGroup, Dialog } from 'vant'
+import { Icon, Tag, Tab, Tabs, Grid, GridItem, Divider, Col, Row, Cell, CellGroup, Dialog } from 'vant'
 import router from '../router/index.ts'
+import HeroListShowDetailNav from '../components/HeroListShowDetailNav.vue'
+import HeroListShowDetailNotice from '../components/HeroListShowDetailNotice'
+import HeroListShowDetailInfoStore from '../components/HeroListShowDetailInfoStore'
 
 export default {
   name: 'HeroListShowDetail',
@@ -229,10 +211,7 @@ export default {
   },
   components: {
     'van-icon': Icon,
-    'van-notice-bar': NoticeBar,
-    'van-action-sheet': ActionSheet,
     'van-tag': Tag,
-    'van-nav-bar': NavBar,
     'van-tab': Tab,
     'van-tabs': Tabs,
     'van-grid': Grid,
@@ -242,7 +221,10 @@ export default {
     'van-row': Row,
     'van-cell': Cell,
     'van-cell-group': CellGroup,
-    'van-dialog': Dialog.Component
+    'van-dialog': Dialog.Component,
+    'hero-detail-nav': HeroListShowDetailNav,
+    'hero-detail-notice': HeroListShowDetailNotice,
+    'hero-detail-info-store': HeroListShowDetailInfoStore
   },
   data () {
     return {
@@ -253,23 +235,10 @@ export default {
       imageRotate: false, // 头像是否旋转
       heroType: 'all',
       heroId: 0,
-      // notice component parameters
-      noticeParams: {
-        show: true,
-        scroll: true,
-        mode: 'closeable', // 是否可关闭
-        url: '',
-        delay: 1,
-        content: '欢迎访问本人博客：http://pygo2.top/'
-      },
       // nav bar component parameters
-      navBarParams: {
-        title: '',
-        leftText: '返回',
-        rightText: '',
-        fixed: false,
-        border: true
-      },
+      navBarShow: true,
+      // notice component parameters
+      noticeBarShow: true,
       // data list and components parameters
       // hero base info
       heroBase: {
@@ -286,9 +255,6 @@ export default {
         show: false,
         active: false,
         title: '英雄故事',
-        closeAble: true,
-        cancelText: '关闭',
-        duration: 0.8,
         resume: '艾琳是黄金森林的在逃精灵公主，日落圣殿的不速之客。',
         content: '<p>精灵族是优雅或是规矩的代名词。他们千百年封闭生活于黄金森林，他们以优雅舞蹈与信仰月桂圣树交流获得力量，阻挡一切外来者的入侵，同时也禁锢了本族的领域。</p><p>公主艾琳天性机灵活泼，对一切未知充满好奇心与探索欲。然而“继承人”的责任始终压在她的肩膀上，她被要求收起不稳重的一面，遵循精灵族舞蹈的优雅与绝对的秩序，做好一个“真正的公主”。</p><p>成年仪式前夕，艾琳决定打破族群禁令，逃去森林外的“危险古怪的人类世界”开启一场自由的冒险。旅程却并没有想象中那样顺遂，人类对精灵同样存在“不详邪恶”的重重误解。</p><p>越是未知，越是有趣，越是困难，越有斗志。她以舞蹈为表达自我的“语言”，与红头发的法师小女孩成为密友，给圣殿严肃守序的骑士团带来了诸多意外麻烦，甚至组成了圣殿小分队在西方大陆的各个地方冒险……</p>'
       },
@@ -385,6 +351,9 @@ export default {
     showDetailStory () {
       this.heroStoreParams.show = true
       this.heroStoreParams.active = true
+    },
+    closeDetailStory () {
+      this.heroStoreParams.show = false
     },
     closeEquipTip () {
       this.heroEqipParams.tipShow = false
