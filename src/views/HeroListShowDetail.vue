@@ -8,27 +8,10 @@
     <hero-detail-notice></hero-detail-notice>
   </div>
   <!-- 基本信息 -->
-  <div class="dc-preview">
-    <img :class="{'image-rotate' : this.imageRotate}"
-         @click="rotateImage()"
-         :src="this.heroBase.image">
-    <div class="dc-preview-content">
-      <div class="dc-pc-title">
-        {{ this.heroBase.name }}
-      </div>
-      <div class="dc-pc-type">
-        <div>定位:
-          <van-tag v-for="item in this.heroBase.role" :key="item.id" :type="item.type" class="dc-preview-tag">{{ item.name}}</van-tag>
-        </div>
-      </div>
-      <div class="dc-pc-resume">
-        {{ this.heroBase.resume }}
-      </div>
-      <!-- 故事 -->
-      <div @click="showDetailStory()" :class='["dc-pc-store", this.heroStoreParams.active == true ? "dc-pc-store-active" : ""]'>
-        .....查看详情
-      </div>
-    </div>
+  <div>
+    <hero-detail-info-base :data="this.heroBase"
+                           @showDetailStory="showDetailStory()">
+    </hero-detail-info-base>
   </div>
   <!-- 技能说明 -->
   <div v-if="this.heroSkillParams.show">
@@ -38,7 +21,7 @@
     <div class="dc-skill">
       <van-tabs v-model:active="this.heroSkillParams.active" swipeable animated>
         <van-tab v-for="(item, index) in this.heroSkillParams.list" :key="index">
-          <template #title> <van-icon :name="item.image" size="2.3rem"/></template>
+          <template #title> <van-icon :name="item.image" :size="this.heroSkillParams.size"/></template>
           <hero-detail-skill :item="item"></hero-detail-skill>
         </van-tab>
       </van-tabs>
@@ -76,21 +59,15 @@
                              :tip="this.heroRuneParams.defaultList.tip">
       </hero-detail-rune-item>
       <!-- 大神推荐符文 -->
-      <div class="dc-module-extra" v-if="this.heroRuneParams.extraShow">
-        <van-cell-group :inset="this.heroRuneParams.extraInset" :border="this.heroRuneParams.extraBorder">
-          <van-cell v-for="(item, index) in this.heroRuneParams.extraList"
-                    :key="item.id"
-                    :icon="item.icon"
-                    :title="item.text"
-                    :label="item.label"
-                    :value="item.value"
-                    :size="this.heroRuneParams.extraSize"
-                    :center="this.heroRuneParams.extraCenter"
-                    :clickable="true"
-                    :is-link="this.heroRuneParams.extraIsLink"
-                    :arrow-direction="this.heroRuneParams.extraIsLinkDir"
-                    @click="showRuneDetail(index)"
-                    />
+      <div class="dc-module-extra" v-if="this.heroRuneRecParams.show">
+        <van-cell-group :inset="this.heroRuneRecParams.inset"
+                        :border="this.heroRuneRecParams.border">
+          <hero-detail-rune-rec-list v-for="(item, index) in this.heroRuneRecParams.list"
+                                     :key="item.id"
+                                     :index="index"
+                                     :item="item"
+                                     @showRuneRecDetail="showRuneRecDetail(index)">
+          </hero-detail-rune-rec-list>
         </van-cell-group>
       </div>
     </div>
@@ -105,41 +82,17 @@
     </hero-detail-info-store>
   </div>
   <!-- 大神推荐符文显示 -->
-  <van-dialog v-model:show="this.heroRuneParams.extraSelectShow"
-              :title="this.heroRuneParams.extraList[this.heroRuneParams.extraSelectIndex].text"
-              >
-    <!-- 符文图文 -->
-      <van-row :align="this.heroRuneParams.cellAlign" :justify="this.heroRuneParams.cellJustify" wrap>
-        <van-col span="8" v-for="item in this.heroRuneParams.extraList[this.heroRuneParams.extraSelectIndex].data" :key="item.id">
-          <div>
-            <div class="dc-module-cell-icon">
-              <van-icon :name="item.image" :size="this.heroRuneParams.cellIconSize"/>
-            </div>
-            <div class="dc-module-cell-title">
-              {{ item.name }}
-            </div>
-            <div class="dc-module-cell-content">
-              {{ item.content }}
-            </div>
-          </div>
-        </van-col>
-      </van-row>
-      <!-- 符文tip -->
-      <van-tag :show="this.heroRuneParams.tipShow"
-         :type="this.heroRuneParams.tipType"
-         :mark="this.heroRuneParams.tipMark"
-         :size="this.heroRuneParams.tipSize"
-         :plain="this.heroRuneParams.tipPlain"
-         :closeable="this.heroRuneParams.tipClose"
-         class="dc-module-tip">
-        {{ this.heroRuneParams.extraList[this.heroRuneParams.extraSelectIndex].label }}
-      </van-tag>
-  </van-dialog>
+  <div v-show="this.heroRuneRecParams.selectShow">
+    <hero-detail-rune-rec-item :show="this.heroRuneRecParams.selectShow"
+                               :data="this.heroRuneRecParams.list[this.heroRuneRecParams.selectIndex]"
+                               @closeRuneRecDetail="closeRuneRecDetail()">
+    </hero-detail-rune-rec-item>
+  </div>
 </template>
 
 <script>
 import { useRoute } from 'vue-router'
-import { Icon, Tag, Tab, Tabs, Col, Row, Cell, CellGroup, Dialog } from 'vant'
+import { Icon, Tab, Tabs, CellGroup } from 'vant'
 import router from '../router/index.ts'
 import HeroListShowDetailNav from '../components/HeroListShowDetailNav.vue'
 import HeroListShowDetailNotice from '../components/HeroListShowDetailNotice'
@@ -148,6 +101,9 @@ import HeroListShowDetailSkill from '../components/HeroListShowDetailSkill'
 import HeroListShowDetailModuleTitle from '../components/HeroListShowDetailModuleTitle'
 import HeroListShowDetailEquip from '../components/HeroListShowDetailEquip'
 import HeroListShowDetailRuneItem from '../components/HeroListShowDetailRuneItem'
+import HeroListShowDetailRuneRecItem from '../components/HeroListShowDetailRuneRecItem'
+import HeroListShowDetailRuneRecList from '../components/HeroListShowDetailRuneRecList'
+import HeroListShowDetailInfoBase from '../components/HeroListShowDetailInfoBase'
 
 export default {
   name: 'HeroListShowDetail',
@@ -165,27 +121,24 @@ export default {
   },
   components: {
     'van-icon': Icon,
-    'van-tag': Tag,
     'van-tab': Tab,
     'van-tabs': Tabs,
-    'van-col': Col,
-    'van-row': Row,
-    'van-cell': Cell,
     'van-cell-group': CellGroup,
-    'van-dialog': Dialog.Component,
     'hero-detail-nav': HeroListShowDetailNav,
     'hero-detail-notice': HeroListShowDetailNotice,
+    'hero-detail-info-base': HeroListShowDetailInfoBase,
     'hero-detail-info-store': HeroListShowDetailInfoStore,
     'hero-detail-skill': HeroListShowDetailSkill,
     'hero-detail-module-title': HeroListShowDetailModuleTitle,
     'hero-detail-equip': HeroListShowDetailEquip,
-    'hero-detail-rune-item': HeroListShowDetailRuneItem
+    'hero-detail-rune-item': HeroListShowDetailRuneItem,
+    'hero-detail-rune-rec-item': HeroListShowDetailRuneRecItem,
+    'hero-detail-rune-rec-list': HeroListShowDetailRuneRecList
   },
   data () {
     return {
-      // use instance parameter
+      // router parameter
       route: null,
-      dialog: null,
       // other
       imageRotate: false, // 头像是否旋转
       heroType: 'all',
@@ -217,6 +170,7 @@ export default {
       heroSkillParams: {
         show: true,
         active: 0,
+        size: '2.3rem',
         list: [
           { id: 1, name: '精灵舞步', cd: '0', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15500.png', description: '艾琳普攻命中敌人后造成150(+20%法术攻击)法术伤害，并获得能量，能量满后艾琳消耗能量急速飞行。 能量满后艾琳获得一次强化普攻，对首个命中的目标造成180(+30%法术攻击)法术伤害。 艾琳每100点法术攻击可以转化为1%暴击率。' },
           { id: 2, name: '叶舞·致意', cd: '7', blue: '0', image: 'http://game.gtimg.cn/images/yxzj/img201606/heroimg/155/15510.png', description: '艾琳射出一束月桂叶，对命中的目标造成法术伤害，命中敌方英雄或飞行到最远处后展开成环，对触碰的敌人造成法术伤害和50%减速，持续1秒。' },
@@ -251,21 +205,20 @@ export default {
             { id: 2, name: '贪婪', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/2503.png', content: '法术吸血+1.6%', url: '' },
             { id: 3, name: '心眼', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/3515.png', content: '暴攻速加成+0.6%\n法术穿透+6.4', url: '' }
           ]
-        },
-        extraShow: true, // 大神推荐附文
-        extraInset: false, // 是否展示为圆角卡片风格
-        extraBorder: true,
-        extraSize: 'normal', // large
-        extraCenter: true,
-        extraIsLink: true,
-        extraIsLinkDir: '', // top left down right(default, value is null)
-        extraList: [
+        }
+      },
+      // hero recommand runes scheme
+      heroRuneRecParams: {
+        show: true, // 大神推荐附文
+        inset: false, // 是否展示为圆角卡片风格
+        border: true,
+        list: [
           { id: 1, text: '大神推荐1', icon: 'location-o', label: '高爆发、高吸血', value: '', data: [{ id: 1, name: '无双', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/1510.png', content: '暴击率+0.7%\n暴击效果+3.6%', url: '/' }, { id: 2, name: '贪婪', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/2503.png', content: '法术吸血+1.6%', url: '' }, { id: 3, name: '心眼', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/3515.png', content: '暴攻速加成+0.6%\n法术穿透+6.4', url: '' }] },
           { id: 2, text: '大神推荐2', icon: 'shop-o', label: '前期够坦度，抗压推荐', value: '', data: [{ id: 1, name: '无双', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/1510.png', content: '暴击率+0.7%\n暴击效果+3.6%', url: '/' }, { id: 2, name: '贪婪', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/2503.png', content: '法术吸血+1.6%', url: '' }, { id: 3, name: '心眼', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/3515.png', content: '暴攻速加成+0.6%\n法术穿透+6.4', url: '' }] },
           { id: 3, text: '大神推荐3', icon: 'location-o', label: '百穿符文，帮助前期打出伤害，顺利过渡到中后期', value: '', data: [{ id: 1, name: '无双', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/1510.png', content: '暴击率+0.7%\n暴击效果+3.6%', url: '/' }, { id: 2, name: '贪婪', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/2503.png', content: '法术吸血+1.6%', url: '' }, { id: 3, name: '心眼', image: 'https://game.gtimg.cn/images/yxzj/img201606/mingwen/3515.png', content: '暴攻速加成+0.6%\n法术穿透+6.4', url: '' }] }
         ],
-        extraSelectIndex: 0,
-        extraSelectShow: false
+        selectIndex: 0,
+        selectShow: false
       }
     }
   },
@@ -284,68 +237,22 @@ export default {
     },
     showDetailStory () {
       this.heroStoreParams.show = true
-      this.heroStoreParams.active = true
     },
     closeDetailStory () {
       this.heroStoreParams.show = false
     },
-    showRuneDetail (index) {
-      this.heroRuneParams.extraSelectShow = true
-      this.heroRuneParams.extraSelectIndex = index
+    showRuneRecDetail (index) {
+      this.heroRuneRecParams.selectShow = true
+      this.heroRuneRecParams.selectIndex = index
+    },
+    closeRuneRecDetail () {
+      this.heroRuneRecParams.selectShow = false
     }
   }
 }
 </script>
 
 <style scoped>
-.dc-pc-store-active {
-  color: red !important;
-}
-.dc-pc-store {
-  color: #1989FA;
-  height: 2rem;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.dc-preview {
-  margin-top: 0.5rem;
-  display: flex;
-  font-size: 1rem;
-  padding: 0 var(--van-padding-md);
-}
-.dc-preview img {
-  flex-shrink: 0;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 1.5rem;
-  margin-right: var(--van-padding-md);
-}
-.dc-preview-tag {
-  margin-left: 0.5rem;
-}
-.dc-preview .dc-preview-content {
-  padding-top: 0.5rem;
-}
-.dc-preview .dc-preview-content .dc-pc-title {
-  font-size: 1.1rem;
-  font-weight: 800;
-}
-.dc-preview .dc-preview-content .dc-pc-type {
-  margin: 0.5rem 0 0;
-  font-weight: 500;
-}
-.dc-preview .dc-preview-content .dc-pc-resume{
-  margin: 0.5rem 0 0;
-  line-height: 1.5rem;
-}
-.sheetContent {
-  padding: 0.3rem 1.5rem 0.3rem 1.5rem;
-}
-.image-rotate {
-  transform: rotate(-360deg) scale(1.2, 1.2);
-  transition: all 2s;
-}
 .dc-skill {
   /*border-top: 1px solid #888888;*/
   margin-top: 0.5rem;
@@ -371,18 +278,6 @@ export default {
   font-size: 1rem !important;
   font-weight: 800;
   letter-spacing: 2px;
-}
-.dc-module-cell-icon {
-  text-align: center;
-}
-.dc-module-cell-title {
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 500;
-}
-.dc-module-cell-content {
-  text-align: center;
-  font-size: 0.8rem;
 }
 .dc-module-extra {
   margin-top: 0.5rem;
