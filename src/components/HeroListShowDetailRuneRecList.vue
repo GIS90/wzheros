@@ -39,7 +39,7 @@ export default {
       size: 'normal', // large
       center: true,
       isLink: true,
-      isLinkDir: '' // top left down right(default, value is null)
+      isLinkDir: 'right' // top left down right(default, value is null)
     }
   },
   methods: {

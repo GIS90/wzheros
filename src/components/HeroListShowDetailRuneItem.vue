@@ -1,9 +1,9 @@
 <template>
   <van-row :align="this.rowParams.align" :justify="this.rowParams.justify" wrap>
-        <van-col :span="this.colParams.span" v-for="item in list" :key="item.id">
+    <van-col :span="this.colParams.span" v-for="item in list" :key="item.id">
       <div>
         <div class="dc-module-cell-icon">
-          <van-icon :name="item.image" :size="this.rowParams.iconSize"/>
+          <van-icon :name="item.image" :size="this.colParams.iconSize"/>
         </div>
         <div class="dc-module-cell-title">
           {{ item.name }}
@@ -50,11 +50,11 @@ export default {
   data () {
     return {
       rowParams: {
-        iconSize: '2.8rem',
-        justify: 'center',
-        align: 'top'
+        justify: 'center', // end center space-around space-between
+        align: 'center' // top center bottom
       },
       colParams: {
+        iconSize: '2.8rem',
         span: 8
       },
       tipParams: {

@@ -47,8 +47,9 @@ export default {
       console.log('close notice')
     },
     click () {
-      console.log('click notice')
       if (this.url.indexOf('http://') > -1) {
+        window.location.href = this.url
+      } else if (this.url.indexOf('https://') > -1) {
         window.location.href = this.url
       } else {
         window.location.href = 'http://' + this.url

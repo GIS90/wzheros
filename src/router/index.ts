@@ -4,7 +4,7 @@ import HeroListShow from '../views/HeroListShow.vue'
 import HeroListShowDetail from '../views/HeroListShowDetail.vue'
 import EquipList from '../views/EquipList.vue'
 import DFList from '../views/DFList.vue'
-import SetList from '../views/SetList.vue'
+import UserList from '../views/UserList.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -40,9 +40,9 @@ const routes: Array<RouteRecordRaw> = [
     component: DFList
   },
   {
-    path: '/set',
-    name: 'SetList',
-    component: SetList
+    path: '/user',
+    name: 'UserList',
+    component: UserList
   }
 ]
 

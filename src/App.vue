@@ -39,7 +39,7 @@ export default {
         { id: 1, icon: 'friends-o', name: '英雄', badge: '', to: '/', active: '', inactive: '' },
         { id: 1, icon: 'home-o', name: '装备', badge: '', to: '/equip', active: '', inactive: '' },
         { id: 1, icon: 'gem-o', name: '召唤', badge: '', to: '/df', active: '', inactive: '' },
-        { id: 1, icon: 'setting-o', name: '设置', badge: '5', to: '/set', active: '', inactive: '' }
+        { id: 1, icon: 'setting-o', name: '用户', badge: '5', to: '/user', active: '', inactive: '' }
       ]
     }
   }
