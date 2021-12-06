@@ -14,7 +14,7 @@
 
 <script>
 import { NoticeBar } from 'vant'
-import router from '../router/index.ts'
+import router from '../../router/index.ts'
 
 export default {
   name: 'HeroListShowDetailNotice',

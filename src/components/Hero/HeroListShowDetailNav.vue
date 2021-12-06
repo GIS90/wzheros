@@ -17,7 +17,7 @@
 
 <script>
 import { NavBar, Icon } from 'vant'
-import router from '../router/index.ts'
+import router from '../../router/index.ts'
 
 export default {
   name: 'HeroListShowDetailNav',
