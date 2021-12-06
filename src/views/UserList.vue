@@ -1,7 +1,10 @@
 <template>
+  <!-- 轮播图 -->
+  <div>
+    <user-list-swipe></user-list-swipe>
+  </div>
   <!-- 4个url图标跳转 -->
   <div>
-    <img class="user-poster" src="http://pygo2.top/images/article_github.jpg">
     <van-row class="user-links"
              :justify="this.rowParams.justify"
              :align="this.rowParams.align">
@@ -17,10 +20,14 @@
   <!-- 我的菜单 -->
   <div>
     <van-cell-group :inset="this.cellParams.inset" :border="this.cellParams.border">
-      <van-cell icon="points" title="我的积分" :size="this.cellParams.size" is-link @click="openMenuDeve()"/>
-      <van-cell icon="send-gift-o" title="我的收藏" :size="this.cellParams.size" is-link @click="openMenuDeve()"/>
-      <van-cell icon="gold-coin-o" title="我的优惠券" :size="this.cellParams.size" is-link @click="openMenuDeve()"/>
-      <van-cell icon="gift-o" title="版本信息" :size="this.cellParams.size" is-link @click="openMenuVersion()"/>
+      <van-cell icon="points" title="我的积分"
+                :size="this.cellParams.size" is-link @click="openMenuDeve()"/>
+      <van-cell icon="send-gift-o" title="我的收藏"
+                :size="this.cellParams.size" is-link @click="openMenuDeve()"/>
+      <van-cell icon="gold-coin-o" title="我的优惠券"
+                :size="this.cellParams.size" is-link @click="openMenuDeve()"/>
+      <van-cell icon="gift-o" title="版本信息"
+                :size="this.cellParams.size" is-link @click="openMenuVersion()"/>
     </van-cell-group>
   </div>
 
@@ -42,6 +49,7 @@
 import { Row, Col, Icon, Cell, CellGroup } from 'vant'
 import UserListMenuVersion from '../components/User/UserListMenuVersion'
 import UserListMenuDeve from '../components/User/UserListMenuDeve'
+import UserListSwipe from '../components/User/UserListSwipe'
 
 export default {
   name: 'UserList',
@@ -53,7 +61,8 @@ export default {
     'van-cell': Cell,
     'van-cell-group': CellGroup,
     'user-list-menu-version': UserListMenuVersion,
-    'user-list-menu-deve': UserListMenuDeve
+    'user-list-menu-deve': UserListMenuDeve,
+    'user-list-swipe': UserListSwipe
   },
   data () {
     return {
@@ -109,22 +118,10 @@ export default {
 </script>
 
 <style scoped>
-.user-poster {
-  width: 100%;
-  height: 53vw;
-  display: block;
-}
-.user-group {
-  margin-bottom: 15px;
-}
 .user-links {
   margin: 1rem 0.3rem 1rem 0.3rem;
   font-size: 0.9rem;
   text-align: center;
   background-color: #fff;
-}
-van-icon {
-  display: block;
-  font-size: 24px;
 }
 </style>
