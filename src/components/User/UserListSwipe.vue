@@ -47,7 +47,7 @@ export default {
       },
       notParams: {
         show: true,
-        duration: 2000, // 动画时长，单位为 ms
+        duration: 1200, // 动画时长，单位为 ms
         color: 'white', // 字体颜色，默认
         background: 'black' // 背景颜色，默认
       },
