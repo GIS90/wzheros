@@ -2,6 +2,21 @@
   "name": "vue3_wzhero",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "pygo",
+    "email": "gaoming971366@163.com",
+    "url": "http://pygo2.top"
+  },
+  "contributors": [],
+  "homepage": "http://wzheros.pygo2.top/",
+  "keywords": ["王者荣耀", "vue learning"],
+  "license": "MIT",
+  "description": "VUE3初学实战的第一个项目，王者荣耀游戏英雄、装备、攻略",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GIS90/vue3_wzheros.git"
+  },
+  "main": "src/main.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
